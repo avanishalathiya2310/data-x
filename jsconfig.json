@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@/app/*": ["app/*"],
+      "@/components/*": ["components/*"],
+      "@/features/*": ["features/*"],
+      "@/lib/*": ["lib/*"],
+      "@/services/*": ["services/*"],
+      "@/utils/*": ["utils/*"],
+      "@/config/*": ["config/*"],
+      "area/*": ["components/airbyte/area/*"],
+      "components/*": ["components/airbyte/components/*"],
+      "core/*": ["components/airbyte/core/*"],
+      "hooks/*": ["components/airbyte/hooks/*"],
+      "locales/*": ["components/airbyte/locales/*"],
+      "packages/*": ["components/airbyte/packages/*"],
+      "pages/*": ["components/airbyte/pages/*"],
+      "providers/*": ["components/airbyte/providers/*"],
+      "scss/*": ["components/airbyte/scss/*"],
+      "services/*": ["components/airbyte/services/*"],
+      "test-utils/*": ["components/airbyte/test-utils/*"],
+      "types/*": ["components/airbyte/types/*"],
+      "views/*": ["components/airbyte/views/*"]
+    }
+  }
+}
