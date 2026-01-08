@@ -46,4 +46,4 @@ jobs:
           app-name: 'app-datax-dev-fe'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AEF4005930CA4242AA2269B760BA9339 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ACC00F2466D64A5CA07CD900F35294C3 }}
