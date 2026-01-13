@@ -9,6 +9,20 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "@/store/userSlice";
 import { usePathname } from "next/navigation";
+import {
+  hideCodepages,
+  hideCollections,
+  hideDatastore,
+  hideIntegration,
+  showCodepages,
+  showCollections,
+  showDatastore,
+  showIntegration,
+} from "@/store/iframeSlice";
+import PersistentIntegrationIframe from "@/components/PersistentIframes/PersistentIntegrationIframe";
+import PersistentDatastoreIframe from "@/components/PersistentIframes/PersistentDatastoreIframe";
+import PersistentCollectionIframe from "@/components/PersistentIframes/PersistentCollectionIframe";
+import PersistentCodepagesIframe from "@/components/PersistentIframes/PersistentCodepagesIframe";
 
 const routePermissions = [
   { base: "/integration", permission: "integration" },
@@ -36,6 +50,35 @@ function LayoutInner({ children }) {
   }, [dispatch, user, currentToken]);
 
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname?.startsWith("/integration")) {
+      dispatch(showIntegration());
+      dispatch(hideDatastore());
+      dispatch(hideCollections());
+      dispatch(hideCodepages());
+    } else if (pathname?.startsWith("/datastore")) {
+      dispatch(showDatastore());
+      dispatch(hideIntegration());
+      dispatch(hideCollections());
+      dispatch(hideCodepages());
+    } else if (pathname?.startsWith("/collections")) {
+      dispatch(showCollections());
+      dispatch(hideIntegration());
+      dispatch(hideDatastore());
+      dispatch(hideCodepages());
+    } else if (pathname?.startsWith("/codepages")) {
+      dispatch(showCodepages());
+      dispatch(hideIntegration());
+      dispatch(hideDatastore());
+      dispatch(hideCollections());
+    } else {
+      dispatch(hideIntegration());
+      dispatch(hideDatastore());
+      dispatch(hideCollections());
+      dispatch(hideCodepages());
+    }
+  }, [pathname, dispatch]);
 
   // Auth & permission checks
   // Show loader while store is fetching OR when nothing is known yet (no user, no token, no error)
@@ -131,7 +174,13 @@ function LayoutInner({ children }) {
 const layout = ({ children }) => {
   return (
     <StoreProvider>
-      <LayoutInner>{children}</LayoutInner>
+      <LayoutInner>
+        <PersistentIntegrationIframe />
+        <PersistentDatastoreIframe />
+        <PersistentCollectionIframe />
+        <PersistentCodepagesIframe />
+        {children}
+      </LayoutInner>
     </StoreProvider>
   );
 };

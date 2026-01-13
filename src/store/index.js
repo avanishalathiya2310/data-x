@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import teamsReducer from "./teamSlice";
 import usersReducer from "./userSlice";
 import permissionsReducer from "./permissionSlice";
+import iframeReducer from "./iframeSlice";
 import React from "react";
 
 export const makeStore = () =>
@@ -13,6 +14,7 @@ export const makeStore = () =>
       teams: teamsReducer,
       users: usersReducer,
       permissions: permissionsReducer,
+      iframe: iframeReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
   });
