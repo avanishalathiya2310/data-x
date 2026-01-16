@@ -91,7 +91,7 @@ const TeamMembersList = ({
                 </div>
               </div>
               <div className="flex items-center gap-8">
-                {showPerms.length > 0 && (
+                {/* {showPerms.length > 0 && (
                   <div className="flex flex-wrap gap-3">
                     {showPerms.map((p) => {
                       const label = p.name.replace(/\b\w/g, (c) =>
@@ -126,7 +126,7 @@ const TeamMembersList = ({
                       );
                     })}
                   </div>
-                )}
+                )} */}
                
                 <button
                   onClick={() =>

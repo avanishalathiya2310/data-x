@@ -64,10 +64,10 @@ const nav = [
   //   icon: WechatLogo,
   // },
   {
-    label: "TEAMS",
-    href: "/admin/teams",
+    label: "PERMISSIONS",
+    href: "/admin/permissions",
     icon: UsersThree,
-    permission: "teams",
+    permission: "permissions",
   },
 ];
 

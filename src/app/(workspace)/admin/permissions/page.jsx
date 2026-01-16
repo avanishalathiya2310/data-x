@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import TeamsContent from "@/components/teams/TeamsContent";
+import PermissionsContent from "@/components/teams/PermissionsContent";
 import UsersList from "@/components/teams/UsersList";
 
 const TeamsPage = () => {
@@ -17,7 +17,7 @@ const TeamsPage = () => {
               activeTab === "teams"
                 ? "border-gray-500 text-gray-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-3 px-2 border-b-2 font-medium text-sm cursor-pointer`}
           >
             Teams
           </button>
@@ -27,7 +27,7 @@ const TeamsPage = () => {
               activeTab === "users"
                 ? "border-gray-500 text-gray-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+            } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm cursor-pointer`}
           >
             Users
           </button>
@@ -35,7 +35,7 @@ const TeamsPage = () => {
       </div>
 
       <div className="flex-1 overflow-auto">
-        {activeTab === "teams" ? <TeamsContent /> : <UsersList />}
+        {activeTab === "teams" ? <PermissionsContent /> : <UsersList />}
       </div>
     </div>
   );

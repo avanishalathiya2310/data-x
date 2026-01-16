@@ -9,7 +9,7 @@ const TeamsHeader = ({ onCreate }) => {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold">Teams</h1>
         <p className="text-sm text-gray-500 dark:text-gray-300">
-          Manage teams and their members
+          Manage teams and permissions
         </p>
       </div>
       <button

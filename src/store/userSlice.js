@@ -5,6 +5,7 @@ import axiosApi from "@/lib/axios";
 import { listUsers as serviceListUsers } from "@/lib/services/teams";
 import { getApiErrorMessage } from "@/lib/apiError";
 import { toast } from "react-toastify";
+import { updateMemberRoleThunk } from "./teamSlice";
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchList",
@@ -20,14 +21,14 @@ export const fetchUsers = createAsyncThunk(
 
 // Fetch the current user and store access token in localStorage
 // Update user role
-// Update user role
 export const updateUserRoleThunk = createAsyncThunk(
   "users/updateRole",
-  async ({ userId, roleId }, { rejectWithValue }) => {
+  async ({ userId, roleId }, { dispatch, rejectWithValue }) => {
     try {
       await axiosApi.put(`/api/v1/role/${userId}`, {
         role_id: roleId,
       });
+      // dispatch(updateMemberRoleThunk({ userId, roleId }));
       return { userId, roleId };
     } catch (err) {
       const resp = err?.response?.data;
@@ -73,6 +74,30 @@ export const fetchCurrentUser = createAsyncThunk(
     } catch (err) {
       return rejectWithValue(
         getApiErrorMessage(err, "Failed to fetch current user")
+      );
+    }
+  }
+);
+
+export const updateUserPermissions = createAsyncThunk(
+  "users/updatePermissions",
+  async ({ userId, permissions }, { rejectWithValue }) => {
+    try {
+      await axiosApi.put(
+        "/api/v1/update-user-permission",
+        { id: userId, permissions },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return { userId, permissions };
+    } catch (err) {
+      return rejectWithValue(
+        getApiErrorMessage(err, "Failed to update user permissions")
       );
     }
   }
@@ -171,11 +196,27 @@ const userSlice = createSlice({
         if (userIndex !== -1) {
           state.items[userIndex].role_id = roleId;
         }
-        // Also update in current user if it's the same user
+        // Update in current user if it's the same user
         if (state.current?.id === userId) {
           state.current.role_id = roleId;
         }
-        toast.success("User role updated successfully");
+      })
+      .addCase(updateUserPermissions.fulfilled, (state, action) => {
+        const { userId, permissions } = action.payload;
+        // Update in items array
+        const userIndex = state.items.findIndex((user) => user.id === userId);
+        if (userIndex !== -1) {
+          state.items[userIndex].permissions = permissions;
+        }
+        // Also update in current user if it's the same user
+        if (state.current?.id === userId) {
+          state.current.permissions = permissions;
+        }
+        toast.success("User permissions updated successfully");
+      })
+      .addCase(updateUserPermissions.rejected, (state, action) => {
+        state.error = action.payload || "Failed to update user permissions";
+        toast.error(action.payload || "Failed to update user permissions");
       })
       .addCase(updateUserRoleThunk.rejected, (state, action) => {
         state.error = action.payload || "Failed to update user role";
@@ -203,7 +244,11 @@ const userSlice = createSlice({
         state.entraUsersLoading = false;
         // Add the new user to the items array if not already present
         if (action.payload) {
-          const userExists = state.items.some(user => user.id === action.payload.id || user.email === action.payload.email);
+          const userExists = state.items.some(
+            (user) =>
+              user.id === action.payload.id ||
+              user.email === action.payload.email
+          );
           if (!userExists) {
             state.items = [...state.items, action.payload];
           }
@@ -211,7 +256,8 @@ const userSlice = createSlice({
         }
         // Remove the user from entraUsers if they exist there
         state.entraUsers = state.entraUsers.filter(
-          (user) => user.email.toLowerCase() !== action.payload?.email?.toLowerCase()
+          (user) =>
+            user.email.toLowerCase() !== action.payload?.email?.toLowerCase()
         );
       })
       .addCase(addUserThunk.rejected, (state, action) => {

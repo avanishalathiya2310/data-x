@@ -18,9 +18,9 @@ import {
 } from "@/store/teamSlice";
 import { fetchUsers, fetchCurrentUser } from "@/store/userSlice";
 import { fetchPermissions } from "@/store/permissionSlice";
-import { computeNextPermissionIds, getMemberById } from "@/app/(workspace)/admin/teams/helpers";
+import { computeNextPermissionIds, getMemberById } from "@/app/(workspace)/admin/permissions/helpers";
 
-const TeamsContent = () => {
+const PermissionsContent = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const {
@@ -338,4 +338,4 @@ const TeamsContent = () => {
   );
 };
 
-export default TeamsContent;
+export default PermissionsContent;

@@ -69,7 +69,7 @@ const AddUserModal = ({ setOpen, onCreated }) => {
         <form onSubmit={handleSave}>
           <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2 text-lg font-semibold">
-              Add User Role
+              Add User
             </div>
             <button
               type="button"

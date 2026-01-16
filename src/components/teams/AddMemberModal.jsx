@@ -62,7 +62,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
     const payload = {
       teamId: team?.id,
       userId: Number(selectedUserId),
-      permissions: selectedPermissions.map((id) => Number(id)),
+      // permissions: selectedPermissions.map((id) => Number(id)),
     };
     dispatch(addTeamMemberThunk(payload))
       .then(() => onAdded?.())
@@ -102,7 +102,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <div className="block text-sm font-medium mb-2">Permissions</div>
             <div className="grid grid-cols-3 gap-2">
               {permissions.map((p) => {
@@ -125,7 +125,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
                 <div className="text-xs text-gray-500 dark:text-gray-400">No permissions available</div>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Error messaging can be added here if backend returns validation issues */}
 
