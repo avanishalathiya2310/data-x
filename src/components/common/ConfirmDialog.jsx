@@ -38,7 +38,7 @@ const ConfirmDialog = ({
             className={`rounded-md px-4 py-2 text-sm text-white shadow ${
               destructive
                 ? "bg-red-600 hover:bg-red-700 disabled:opacity-60"
-                : "bg-orange-600 hover:bg-orange-700 disabled:opacity-60"
+                : "bg-[#089bab] hover:bg-[#089bab]/80 disabled:opacity-60"
             }`}
           >
             {busy ? "Processing..." : confirmText}

@@ -142,8 +142,8 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
               disabled={!canSubmit}
               className={`rounded-md px-4 py-2 text-sm text-white shadow ${
                 canSubmit && !submitting
-                  ? "bg-orange-600 hover:bg-orange-700"
-                  : "bg-orange-300 cursor-not-allowed"
+                  ? "bg-[#089bab] hover:bg-[#089bab]/80"
+                  : "bg-[#089bab]/80 cursor-not-allowed"
               }`}
             >
               {submitting ? "Adding..." : "Add Member"}

@@ -69,8 +69,6 @@ const AddUserModal = ({ setOpen, onCreated }) => {
         <form onSubmit={handleSave}>
           <div className="p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2 text-lg font-semibold">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 text-orange-600">
-              </span>
               Add User Role
             </div>
             <button
@@ -92,7 +90,7 @@ const AddUserModal = ({ setOpen, onCreated }) => {
                 id="user-select"
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#089bab]"
                 disabled={submitting || entraUsersLoading}
               >
                 <option value="">Select a user</option>
@@ -148,8 +146,8 @@ const AddUserModal = ({ setOpen, onCreated }) => {
               disabled={!selectedUser || !selectedRole || submitting}
               className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
                 selectedUser && selectedRole && !submitting
-                  ? "bg-orange-600 hover:bg-orange-700"
-                  : "bg-orange-300 cursor-not-allowed"
+                  ? "bg-[#089bab] hover:bg-[#089bab]/80"
+                  : "bg-[#089bab]/80 cursor-not-allowed"
               }`}
             >
               {submitting ? "Saving..." : "Save"}
