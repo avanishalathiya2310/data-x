@@ -104,7 +104,7 @@ export const addTeamMemberThunk = createAsyncThunk(
       const allPerms = state?.permissions?.items || [];
 
       // Base from API or fallback, then enrich identity from users slice
-      let member = res?.data?.data ?? { id: userId, permissions };
+      let member = res?.data[0] ?? { id: userId, permissions };
       member = enrichMember(member, users, userId);
 
       // Normalize permissions for UI
@@ -178,6 +178,25 @@ export const deleteTeamThunk = createAsyncThunk(
       const validationMsg = Array.isArray(resp?.errors) && resp.errors[0]?.msg ? resp.errors[0].msg : null;
       const baseMsg = getApiErrorMessage(err, "Failed to delete team");
       return rejectWithValue(validationMsg || baseMsg);
+    }
+  }
+);
+
+// Update a team member's role
+export const updateMemberRoleThunk = createAsyncThunk(
+  "teams/updateMemberRole",
+  async ({ userId, roleId }, { rejectWithValue }) => {
+    try {
+      await axiosApi.put(`/api/v1/role/${userId}`, {
+        role_id: roleId
+      });
+      return { userId, roleId };
+    } catch (err) {
+      const resp = err?.response?.data;
+      const validationMsg = Array.isArray(resp?.errors) && resp.errors[0]?.msg 
+        ? resp.errors[0].msg 
+        : getApiErrorMessage(err, "Failed to update member role");
+      return rejectWithValue(validationMsg);
     }
   }
 );
@@ -289,24 +308,45 @@ const teamSlice = createSlice({
         toast.success("Member removed successfully", { toastId: action.type });
       })
       .addCase(removeTeamMemberThunk.rejected, (state, action) => {
-        const msg = action.payload || action.error?.message || "Failed to remove member";
-        toast.error(msg, { toastId: action.type });
-      })
-      .addCase(updateTeamMemberPermissionsThunk.fulfilled, (state, action) => {
-        const { teamId, userId, permissionIds, permissionKeys } = action.payload || {};
-        const current = state.membersByTeam[teamId] || { items: [], loading: false, error: null };
-        const nextItems = Array.isArray(current.items) ? [...current.items] : [];
-        const idx = nextItems.findIndex((m) => (m?.id ?? m?.user_id) === userId);
-        if (idx >= 0) {
-          nextItems[idx] = { ...nextItems[idx], permission_ids: permissionIds, permissions: permissionKeys };
+      const teamId = action.meta.arg?.teamId;
+      state.error = action.payload || action.error.message;
+      if (teamId && state.membersByTeam[teamId]) {
+        state.membersByTeam[teamId].error = action.payload || action.error.message;
+      }
+    })
+    .addCase(updateMemberRoleThunk.fulfilled, (state, action) => {
+      const { teamId, userId, roleId } = action.payload;
+      if (state.membersByTeam[teamId]?.items) {
+        const memberIndex = state.membersByTeam[teamId].items.findIndex(m => m.id === userId);
+        if (memberIndex !== -1) {
+          state.membersByTeam[teamId].items[memberIndex].role_id = roleId;
+          toast.success("Member role updated successfully", { toastId: action.type });
         }
-        state.membersByTeam[teamId] = { ...current, items: nextItems };
-        toast.success("Member permissions updated", { toastId: action.type });
-      })
-      .addCase(updateTeamMemberPermissionsThunk.rejected, (state, action) => {
-        const msg = action.payload || action.error?.message || "Failed to update member";
-        toast.error(msg, { toastId: action.type });
-      });
+      }
+    })
+    .addCase(updateMemberRoleThunk.rejected, (state, action) => {
+      const msg = action.payload || action.error?.message || "Failed to update member role";
+      toast.error(msg, { toastId: action.type });
+    })
+    .addCase(updateTeamMemberPermissionsThunk.fulfilled, (state, action) => {
+      const { teamId, userId, permissionIds, permissionKeys } = action.payload || {};
+      const current = state.membersByTeam[teamId] || { items: [], loading: false, error: null };
+      const nextItems = Array.isArray(current.items) ? [...current.items] : [];
+      const idx = nextItems.findIndex((m) => (m?.id ?? m?.user_id) === userId);
+      if (idx >= 0) {
+        nextItems[idx] = {
+          ...nextItems[idx],
+          permission_ids: permissionIds,
+          permissions: permissionKeys
+        };
+      }
+      state.membersByTeam[teamId] = { ...current, items: nextItems };
+      toast.success("Member permissions updated", { toastId: action.type });
+    })
+    .addCase(updateTeamMemberPermissionsThunk.rejected, (state, action) => {
+      const msg = action.payload || action.error?.message || "Failed to update member permissions";
+      toast.error(msg, { toastId: action.type });
+    });
   },
 });
 

@@ -2,6 +2,8 @@
 
 import React from "react";
 import { Trash } from "@phosphor-icons/react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateMemberRoleThunk } from "@/store/teamSlice";
 
 const TeamMembersList = ({
   team,
@@ -11,6 +13,8 @@ const TeamMembersList = ({
   onRemoveMember,
   onTogglePermission,
 }) => {
+  const dispatch = useDispatch();
+  const { current: currentUser } = useSelector((state) => state.users || {});
   const state = membersState || {};
 
   if (state.loading) {
@@ -58,7 +62,12 @@ const TeamMembersList = ({
     return String(val).toLowerCase();
   };
 
-  const VISIBLE_PERM_KEYS = ["integration", "datastore", "collections", "codepages"];
+  const VISIBLE_PERM_KEYS = [
+    "integration",
+    "datastore",
+    "collections",
+    "codepages",
+  ];
   const showPerms = VISIBLE_PERM_KEYS.map((k) => ({ id: k, key: k, name: k }));
 
   return (
@@ -68,14 +77,17 @@ const TeamMembersList = ({
         const memberPermSet = new Set(
           Array.isArray(rawPerms) ? rawPerms.map((v) => toKey(v)) : []
         );
+
         const isBusy = removingMemberKey === `${team.id}:${m.id}`;
+
+        const isCurrentUser = currentUser?.id === m?.id;
         return (
           <li key={m.id || i} className="px-3 py-2 text-sm">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="font-medium">{m.email}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {m.username}
+                  {m.username} - {m.role}
                 </div>
               </div>
               <div className="flex items-center gap-8">
@@ -91,13 +103,15 @@ const TeamMembersList = ({
                       return (
                         <label
                           key={p.id}
-                          className="inline-flex items-center gap-2 text-xs"
+                          className={`inline-flex items-center gap-2 text-xs ${isCurrentUser ? 'opacity-50' : ''}`}
                         >
                           <input
                             type="checkbox"
                             className="h-4 w-4"
                             checked={!!checked}
+                            disabled={isCurrentUser}
                             onChange={(e) =>
+                              !isCurrentUser &&
                               onTogglePermission &&
                               onTogglePermission(
                                 team.id,
@@ -113,13 +127,14 @@ const TeamMembersList = ({
                     })}
                   </div>
                 )}
+               
                 <button
                   onClick={() =>
                     onRemoveMember && onRemoveMember(team.id, m.id)
                   }
                   className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60"
-                  disabled={isBusy}
-                  title={isBusy ? "Removing..." : "Remove member"}
+                  disabled={isBusy || isCurrentUser}
+                  title={isBusy ? "Removing..." : isCurrentUser ? "You can't remove yourself" : "Remove member"}
                 >
                   <Trash size={14} />
                 </button>

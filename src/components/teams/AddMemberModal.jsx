@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addTeamMemberThunk } from "@/store/teamSlice";
 
 
@@ -14,6 +14,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
     return !!selectedUserId && !submitting;
   }, [selectedUserId, submitting]);
 
+  const { current: currentUser } = useSelector((state) => state.users || {});
   const users = Array.isArray(usersProp) ? usersProp : [];
   const permissions = Array.isArray(permissionsProp) ? permissionsProp : [];
 
@@ -33,10 +34,19 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
   const filteredUsers = useMemo(() => users.filter((u) => {
     const uid = u?.id != null ? Number(u.id) : u?.user_id != null ? Number(u.user_id) : undefined;
     const email = (u?.email || u?.username || "").toLowerCase();
+    const currentUserId = currentUser?.id != null ? Number(currentUser.id) : undefined;
+    const currentUserEmail = (currentUser?.email || currentUser?.username || "").toLowerCase();
+    
+    // Skip if user is already a member
     if (uid != null && existing.ids.has(uid)) return false;
     if (email && existing.emails.has(email)) return false;
+    
+    // Skip if user is the current user
+    if (uid === currentUserId) return false;
+    if (email && email === currentUserEmail) return false;
+    
     return true;
-  }), [users, existing]);
+  }), [users, existing, currentUser]);
 
   const togglePermission = (permId) => {
     setSelectedPermissions((prev) => prev.includes(permId)

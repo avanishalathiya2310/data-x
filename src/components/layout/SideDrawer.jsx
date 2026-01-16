@@ -93,8 +93,10 @@ const SideDrawer = ({ expanded, onToggle }) => {
     
     allowedNav.forEach((item) => {
       if (item.isAccordion && item.subItems) {
-        const hasActiveSubItem = item.subItems.some((subItem) =>
-          pathname === subItem.href || pathname?.startsWith(subItem.href + "/")
+        const hasActiveSubItem = item.subItems.some(
+          (subItem) =>
+            pathname === subItem.href ||
+            pathname?.startsWith(subItem.href + "/")
         );
         if (hasActiveSubItem) {
           setOpenAccordion(item.label);
@@ -152,7 +154,10 @@ const SideDrawer = ({ expanded, onToggle }) => {
                           : "hover:bg-main hover:text-white"
                       }`}
                     >
-                      <IconCmp className="mr-3 h-5 w-5 shrink-0" weight="regular" />
+                      <IconCmp
+                        className="mr-3 h-5 w-5 shrink-0"
+                        weight="regular"
+                      />
                       <span
                         className={`whitespace-nowrap cursor-pointer transition-opacity duration-300 ease-in-out flex-1 text-left ${
                           expanded ? "delay-50 opacity-100" : "opacity-0"
@@ -160,13 +165,15 @@ const SideDrawer = ({ expanded, onToggle }) => {
                       >
                         {item.label}
                       </span>
-                      {expanded && (
-                        isAccordionOpen ? (
+                      {expanded &&
+                        (isAccordionOpen ? (
                           <CaretUp className="h-4 w-4 shrink-0" weight="bold" />
                         ) : (
-                          <CaretDown className="h-4 w-4 shrink-0" weight="bold" />
-                        )
-                      )}
+                          <CaretDown
+                            className="h-4 w-4 shrink-0"
+                            weight="bold"
+                          />
+                        ))}
 
                       {/* Active bar */}
                       {isAnySubItemActive && (
@@ -179,7 +186,9 @@ const SideDrawer = ({ expanded, onToggle }) => {
                       <div className="ml-4 mt-1">
                         {item.subItems.map((subItem) => {
                           const SubIconCmp = subItem.icon;
-                          const isSubActive = pathname?.startsWith(subItem.href);
+                          const isSubActive = pathname?.startsWith(
+                            subItem.href
+                          );
 
                           return (
                             <Link
@@ -191,7 +200,10 @@ const SideDrawer = ({ expanded, onToggle }) => {
                                   : "hover:bg-main/60 hover:text-white"
                               }`}
                             >
-                              <SubIconCmp className="mr-2 h-4 w-4 shrink-0" weight="regular" />
+                              <SubIconCmp
+                                className="mr-2 h-4 w-4 shrink-0"
+                                weight="regular"
+                              />
                               <span className="whitespace-nowrap">
                                 {subItem.label}
                               </span>
