@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Loader from "../layout/Loader";
 
 export default function PersistentIntegrationIframe() {
   const { ingestVisible, ingestLoaded } = useSelector((s) => s.iframe);
   const { currentToken } = useSelector((s) => s.users);
   const [refreshNonce, setRefreshNonce] = useState("light");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -27,6 +29,11 @@ export default function PersistentIntegrationIframe() {
           : "hidden pointer-events-none"
       }`}
     >
+      {isLoading && (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loader />
+        </div>
+      )}
       <iframe
         title="Integration"
         src={`https://app-ingest-dev-fe-haamgnfdffe5eedu.swedencentral-01.azurewebsites.net/?accessToken=${encodeURIComponent(
@@ -34,7 +41,8 @@ export default function PersistentIntegrationIframe() {
         )}&theme=${
           refreshNonce === "dark" ? "airbyteThemeDark" : "airbyteThemeLight"
         }`}
-        className="w-full h-full"
+        className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
+        onLoad={() => setIsLoading(false)}
       />
     </div>
   );

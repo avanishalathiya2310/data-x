@@ -1,6 +1,7 @@
 "use client";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import Loader from "../layout/Loader";
 
 export default function PersistentCollectionsIframe() {
   const { collectionsVisible, collectionsLoaded } = useSelector(
@@ -8,6 +9,7 @@ export default function PersistentCollectionsIframe() {
   );
   const { currentToken } = useSelector((s) => s.users);
   const [refreshNonce, setRefreshNonce] = useState("light");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -30,13 +32,19 @@ export default function PersistentCollectionsIframe() {
           : "hidden pointer-events-none"
       }`}
     >
+      {isLoading && (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loader />
+        </div>
+      )}
       <iframe
         key={`${currentToken}:${refreshNonce}`}
         title="Collections"
         src={`https://ssbi-dev.datax.nuvinno.no/superset/welcome?accessToken=${encodeURIComponent(
           currentToken
         )}`}
-        className="w-full h-full"
+        className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
+        onLoad={() => setIsLoading(false)}
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
       />
     </div>

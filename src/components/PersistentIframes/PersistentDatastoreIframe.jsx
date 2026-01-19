@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Loader from "../layout/Loader";
 
 export default function PersistentDatastoreIframe() {
     const { datastoreVisible, datastoreLoaded } = useSelector((s) => s.iframe);
     const { currentToken } = useSelector((s) => s.users);
     const [refreshNonce, setRefreshNonce] = useState("light");
+    const [isLoading, setIsLoading] = useState(true);
   
     useEffect(() => {
       const saved = localStorage.getItem("theme");
@@ -27,12 +29,18 @@ export default function PersistentDatastoreIframe() {
             : "hidden pointer-events-none"
         }`}
       >
+        {isLoading && (
+          <div className="w-full h-full flex items-center justify-center">
+            <Loader />
+          </div>
+        )}
         <iframe
           title="Datastore"
           src={`https://app-tabix-dev-fe-ancrcgfndfhshyfb.swedencentral-01.azurewebsites.net/#/sql?accessToken=${encodeURIComponent(
             currentToken
           )}&theme=${refreshNonce === "dark" ? "dark" : "light"}`}
-          className="w-full h-full"
+          className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
+          onLoad={() => setIsLoading(false)}
         />
       </div>
     );
