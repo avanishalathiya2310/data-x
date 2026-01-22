@@ -50,19 +50,8 @@ const nav = [
         icon: BookOpen,
         permission: "codepages",
       },
-      // {
-      //   label: "Datalake",
-      //   href: "/datalake",
-      //   icon: TreeStructure,
-      //   permission: "datalake",
-      // },
     ],
   },
-  // {
-  //   label: "AI BOT",
-  //   href: "/bot",
-  //   icon: WechatLogo,
-  // },
   {
     label: "PERMISSIONS",
     href: "/admin/permissions",
@@ -83,6 +72,13 @@ const SideDrawer = ({ expanded, onToggle }) => {
   const allowedNav = isSuperAdmin
     ? nav
     : nav.filter((item) => {
+        // For accordion items, check if user has permission for any sub-item
+        if (item.isAccordion && item.subItems) {
+          return item.subItems.some((subItem) =>
+            subItem.permission && permissions.includes(subItem.permission)
+          );
+        }
+        // For regular items, check the item's permission
         if (!item.permission) return false;
         return permissions.includes(item.permission);
       });
