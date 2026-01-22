@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "@/store/userSlice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   hideCodepages,
   hideCollections,
@@ -29,11 +29,13 @@ const routePermissions = [
   { base: "/datastore", permission: "datastore" },
   { base: "/collections", permission: "collections" },
   { base: "/codepages", permission: "codepages" },
+  { base: "/admin/permissions", permission: "permissions" },
   { base: "/admin/teams", permission: "teams" },
 ];
 
 function LayoutInner({ children }) {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [expanded, setExpanded] = useState(true);
   const {
     current: user,
@@ -86,16 +88,74 @@ function LayoutInner({ children }) {
     !!currentLoading || (!user && !currentToken && !currentError);
   const isAuthenticated = !!(user && currentToken);
   const permissions = Array.isArray(user?.permissions) ? user.permissions : [];
+  const role = user?.role?.toLowerCase?.() || null;
+  const isSuperAdmin = role === "superadmin";
+  const isViewer = role === "viewer";
+  const isAdmin = role === "admin";
+  
   const requiredPermission =
     routePermissions.find((r) => pathname?.startsWith(r.base))?.permission ??
     null;
-  // Admin-specific enforcement
-  const isAdmin = user?.role?.toLowerCase?.() === "admin";
+  
   const hasAnyPermissions = permissions.length > 0;
   const lacksRequired =
     !!requiredPermission && !permissions.includes(requiredPermission);
-  // Block if admin has no permissions, or admin lacks the required permission for the route
-  const shouldBlock = isAdmin && (!hasAnyPermissions || lacksRequired);
+  
+  // Determine if user should be blocked from current route
+  let shouldBlock = false;
+  let blockMessage = "";
+  
+  if (isSuperAdmin) {
+    // SuperAdmin has access to everything
+    shouldBlock = false;
+  } else if (isViewer) {
+    // Viewer can only access collections if they have the permission
+    if (requiredPermission !== "collections" || !permissions.includes("collections")) {
+      shouldBlock = true;
+      blockMessage = "Viewers can only access the Collections page.";
+    }
+  } else if (isAdmin) {
+    // Admin needs permissions for each route
+    if (!hasAnyPermissions || lacksRequired) {
+      shouldBlock = true;
+      blockMessage = !hasAnyPermissions
+        ? "Your account has no permissions assigned. Please contact an administrator."
+        : `You do not have the required permission${requiredPermission ? `: ${requiredPermission}` : ""} to access this route.`;
+    }
+  } else {
+    // Regular users need the specific permission
+    if (lacksRequired) {
+      shouldBlock = true;
+      blockMessage = `You do not have the required permission${requiredPermission ? `: ${requiredPermission}` : ""} to access this route.`;
+    }
+  }
+  
+  // Get first allowed page for redirect
+  const getFirstAllowedPage = () => {
+    if (isSuperAdmin) return "/integration";
+    
+    if (isViewer) {
+      return permissions.includes("collections") ? "/collections" : null;
+    }
+    
+    // For admin and regular users, find first page they have permission for
+    for (const route of routePermissions) {
+      if (permissions.includes(route.permission)) {
+        return route.base;
+      }
+    }
+    return null;
+  };
+  
+  // Redirect if blocked
+  useEffect(() => {
+    if (isAuthenticated && shouldBlock && !isLoading) {
+      const firstAllowedPage = getFirstAllowedPage();
+      if (firstAllowedPage && pathname !== firstAllowedPage) {
+        router.push(firstAllowedPage);
+      }
+    }
+  }, [isAuthenticated, shouldBlock, isLoading, pathname]);
 
   return (
     <>
@@ -128,21 +188,11 @@ function LayoutInner({ children }) {
           {shouldBlock ? (
             <div className="w-full h-full flex items-center justify-center p-4">
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-md p-6 max-w-lg text-center">
-                <p className="mb-2 font-medium">Access restricted for admin.</p>
-                {!hasAnyPermissions ? (
-                  <p className="mb-4 text-sm opacity-80">
-                    Your account has no permissions assigned. Please contact an
-                    administrator.
-                  </p>
-                ) : (
-                  lacksRequired && (
-                    <p className="mb-4 text-sm opacity-80">
-                      You do not have the required permission
-                      {requiredPermission ? `: ${requiredPermission}` : ""} to
-                      access this route.
-                    </p>
-                  )
-                )}
+                <p className="mb-2 font-medium">Access Denied</p>
+                <p className="mb-4 text-sm opacity-80">
+                  {blockMessage || "You do not have permission to access this page."}
+                </p>
+                <p className="text-xs opacity-60">Redirecting to your allowed page...</p>
               </div>
             </div>
           ) : (
