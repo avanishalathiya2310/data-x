@@ -68,9 +68,12 @@ const SideDrawer = ({ expanded, onToggle }) => {
   const role = user?.role || null;
   const permissions = Array.isArray(user?.permissions) ? user.permissions : [];
   const isSuperAdmin = role?.toLowerCase() === "superadmin";
+  const isViewer = role?.toLowerCase() === "viewer";
 
   const allowedNav = isSuperAdmin
     ? nav
+    : isViewer
+    ? nav.filter((item) => item.permission === "collections")
     : nav.filter((item) => {
         // For accordion items, check if user has permission for any sub-item
         if (item.isAccordion && item.subItems) {
