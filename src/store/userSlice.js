@@ -23,13 +23,19 @@ export const fetchUsers = createAsyncThunk(
 // Update user role
 export const updateUserRoleThunk = createAsyncThunk(
   "users/updateRole",
-  async ({ userId, roleId }, { dispatch, rejectWithValue }) => {
+  async ({ userId, roleId }, { dispatch, rejectWithValue, getState }) => {
     try {
       await axiosApi.put(`/api/v1/role/${userId}`, {
         role_id: roleId,
       });
-      // dispatch(updateMemberRoleThunk({ userId, roleId }));
-      return { userId, roleId };
+      
+      // Get the role name from roles state
+      const state = getState();
+      const roles = state?.roles?.items || [];
+      const role = roles.find((r) => r.id === roleId);
+      const roleName = role?.role_name || role?.name || '';
+      
+      return { userId, roleId, roleName };
     } catch (err) {
       const resp = err?.response?.data;
       const validationMsg =
@@ -140,6 +146,23 @@ export const fetchEntraUsers = createAsyncThunk(
       return rejectWithValue(
         getApiErrorMessage(err, "Failed to fetch Entra users")
       );
+    }
+  }
+);
+
+export const deleteUserThunk = createAsyncThunk(
+  "users/deleteUser",
+  async (userId, { rejectWithValue }) => {
+    try {
+      await axiosApi.delete(`/api/v1/user/${userId}`, {
+        headers: {
+          Accept: "application/json",
+        },
+        withCredentials: true,
+      });
+      return userId;
+    } catch (err) {
+      return rejectWithValue(getApiErrorMessage(err, "Failed to delete user"));
     }
   }
 );
@@ -264,6 +287,21 @@ const userSlice = createSlice({
         state.entraUsersLoading = false;
         state.error = action.payload || "Failed to add user";
         toast.error(action.payload || "Failed to add user");
+      })
+      .addCase(deleteUserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUserThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        // Remove the user from the items array
+        state.items = state.items.filter((user) => user.id !== action.payload);
+        toast.success("User deleted successfully");
+      })
+      .addCase(deleteUserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to delete user";
+        toast.error(action.payload || "Failed to delete user");
       });
   },
 });

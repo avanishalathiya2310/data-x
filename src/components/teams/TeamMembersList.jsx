@@ -132,7 +132,7 @@ const TeamMembersList = ({
                   onClick={() =>
                     onRemoveMember && onRemoveMember(team.id, m.id)
                   }
-                  className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60 cursor-pointer"
                   disabled={isBusy || isCurrentUser}
                   title={isBusy ? "Removing..." : isCurrentUser ? "You can't remove yourself" : "Remove member"}
                 >

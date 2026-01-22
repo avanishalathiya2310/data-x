@@ -5,6 +5,7 @@ import axiosApi from "@/lib/axios";
 import { listTeams as serviceListTeams } from "@/lib/services/teams";
 import { toast } from "react-toastify";
 import { getApiErrorMessage } from "@/lib/apiError";
+import { deleteUserThunk, updateUserRoleThunk } from "./userSlice";
 
 
 const normalizePermissionIds = (raw) => {
@@ -347,6 +348,53 @@ const teamSlice = createSlice({
     .addCase(updateTeamMemberPermissionsThunk.rejected, (state, action) => {
       const msg = action.payload || action.error?.message || "Failed to update member permissions";
       toast.error(msg, { toastId: action.type });
+    })
+    // Handle user deletion - remove user from all teams
+    .addCase(deleteUserThunk.fulfilled, (state, action) => {
+      const deletedUserId = action.payload;
+      // Iterate through all teams and remove the deleted user from their member lists
+      Object.keys(state.membersByTeam).forEach((teamId) => {
+        const current = state.membersByTeam[teamId];
+        if (current?.items) {
+          const filteredItems = current.items.filter(
+            (member) => (member?.id ?? member?.user_id) !== deletedUserId
+          );
+          // Only update if the array actually changed
+          if (filteredItems.length !== current.items.length) {
+            state.membersByTeam[teamId] = {
+              ...current,
+              items: filteredItems,
+            };
+          }
+        }
+      });
+    })
+    // Handle user role update - update role in all teams
+    .addCase(updateUserRoleThunk.fulfilled, (state, action) => {
+      const { userId, roleId, roleName } = action.payload;
+      
+      // Iterate through all teams and update the user's role in their member lists
+      Object.keys(state.membersByTeam).forEach((teamId) => {
+        const current = state.membersByTeam[teamId];
+        if (current?.items) {
+          const memberIndex = current.items.findIndex(
+            (member) => (member?.id ?? member?.user_id) === userId
+          );
+          if (memberIndex !== -1) {
+            // Create a new array with the updated member to ensure immutability
+            const updatedItems = [...current.items];
+            updatedItems[memberIndex] = {
+              ...updatedItems[memberIndex],
+              role_id: roleId,
+              role: roleName,
+            };
+            state.membersByTeam[teamId] = {
+              ...current,
+              items: updatedItems,
+            };
+          }
+        }
+      });
     });
   },
 });

@@ -8,10 +8,12 @@ import {
   fetchUsers,
   updateUserPermissions,
   updateUserRoleThunk,
+  deleteUserThunk,
 } from "@/store/userSlice";
 import { fetchRoles } from "@/store/roleSlice";
-import { UserPlus } from "@phosphor-icons/react";
+import { UserPlus, Trash } from "@phosphor-icons/react";
 import AddUserModal from "./AddUser";
+import DeleteUserModal from "./DeleteUserModal";
 import { computeNextPermissionIds } from "@/app/(workspace)/admin/permissions/helpers";
 import { toast } from "react-toastify";
 
@@ -27,11 +29,13 @@ const UsersList = () => {
     if (user.id === currentUser?.id) return;
 
     const permList = Array.isArray(permissions) ? permissions : [];
-    
+
     // Check if user already has this permission
     const userPerms = Array.isArray(user.permissions) ? user.permissions : [];
-    const hasPermission = userPerms.some(up => toKey(up) === toKey(permissionKey));
-    
+    const hasPermission = userPerms.some(
+      (up) => toKey(up) === toKey(permissionKey)
+    );
+
     // Toggle the permission (if has permission, disable it; if not, enable it)
     const nextIds = computeNextPermissionIds(
       permList,
@@ -39,7 +43,7 @@ const UsersList = () => {
       permissionKey,
       !hasPermission // Toggle the current state
     );
-    
+
     if (!nextIds) return;
 
     try {
@@ -55,6 +59,7 @@ const UsersList = () => {
   };
 
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     if (!users.length) {
@@ -167,7 +172,7 @@ const UsersList = () => {
                             >
                               <input
                                 type="checkbox"
-                                className="h-4 w-4"
+                                className="h-4 w-4 cursor-pointer"
                                 checked={!!checked}
                                 disabled={isCurrentUser}
                                 onChange={(e) =>
@@ -214,6 +219,19 @@ const UsersList = () => {
                         ))}
                       </select>
                     </div>
+
+                    <button
+                      onClick={() => !isCurrentUser && setUserToDelete(user)}
+                      disabled={isCurrentUser}
+                      className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                      title={
+                        isCurrentUser
+                          ? "You can't remove yourself"
+                          : "Remove member"
+                      }
+                    >
+                      <Trash size={14} />
+                    </button>
                   </div>
                 </div>
               </li>
@@ -224,6 +242,13 @@ const UsersList = () => {
         <AddUserModal
           setOpen={setIsAddUserModalOpen}
           onCreated={() => setIsAddUserModalOpen(false)}
+        />
+      )}
+      {userToDelete && (
+        <DeleteUserModal
+          user={userToDelete}
+          onClose={() => setUserToDelete(null)}
+          onConfirm={(userId) => dispatch(deleteUserThunk(userId)).unwrap()}
         />
       )}
     </div>

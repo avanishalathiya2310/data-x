@@ -114,7 +114,7 @@ const AddUserModal = ({ setOpen, onCreated }) => {
                       name="role"
                       checked={selectedRole === role.id.toString()}
                       onChange={() => handleRoleChange(role.id.toString())}
-                      className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
+                      className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 cursor-pointer"
                       disabled={submitting}
                     />
                     <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -136,7 +136,7 @@ const AddUserModal = ({ setOpen, onCreated }) => {
             <button
               type="button"
               onClick={closeModal}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-dark-primary border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-dark-secondary"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-dark-primary border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-dark-secondary cursor-pointer"
               disabled={submitting}
             >
               Cancel
@@ -146,7 +146,7 @@ const AddUserModal = ({ setOpen, onCreated }) => {
               disabled={!selectedUser || !selectedRole || submitting}
               className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
                 selectedUser && selectedRole && !submitting
-                  ? "bg-[#089bab] hover:bg-[#089bab]/80"
+                  ? "bg-[#089bab] hover:bg-[#089bab]/80 cursor-pointer"
                   : "bg-[#089bab]/80 cursor-not-allowed"
               }`}
             >

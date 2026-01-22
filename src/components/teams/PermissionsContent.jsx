@@ -198,14 +198,14 @@ const PermissionsContent = () => {
                       ensureMembersLoaded(t.id);
                       setMemberModalFor(t);
                     }}
-                    className="inline-flex items-center gap-2 rounded-md border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-sm bg-white dark:bg-dark-secondary hover:bg-gray-50"
+                    className="inline-flex items-center gap-2 rounded-md border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-sm bg-white dark:bg-dark-secondary hover:bg-gray-50 cursor-pointer"
                   >
                     <UserPlus size={16} /> Add Member
                   </button>
                   <button
                     onClick={() => setConfirmDelete(t)}
                     disabled={actionBusy === t.id}
-                    className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-60 cursor-pointer"
                   >
                     <Trash size={16} />{" "}
                     {actionBusy === t.id ? "Deleting..." : "Delete Team"}

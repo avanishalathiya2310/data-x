@@ -133,7 +133,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-4 py-2 text-sm"
+              className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-4 py-2 text-sm cursor-pointer"
             >
               Cancel
             </button>
@@ -142,7 +142,7 @@ const AddMemberModal = ({ team, users: usersProp = [], permissions: permissionsP
               disabled={!canSubmit}
               className={`rounded-md px-4 py-2 text-sm text-white shadow ${
                 canSubmit && !submitting
-                  ? "bg-[#089bab] hover:bg-[#089bab]/80"
+                  ? "bg-[#089bab] hover:bg-[#089bab]/80 cursor-pointer"
                   : "bg-[#089bab]/80 cursor-not-allowed"
               }`}
             >

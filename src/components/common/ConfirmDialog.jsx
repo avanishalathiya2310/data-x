@@ -26,7 +26,7 @@ const ConfirmDialog = ({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-4 py-2 text-sm"
+            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary px-4 py-2 text-sm cursor-pointer"
             disabled={busy}
           >
             {cancelText}
@@ -35,7 +35,7 @@ const ConfirmDialog = ({
             type="button"
             onClick={onConfirm}
             disabled={busy}
-            className={`rounded-md px-4 py-2 text-sm text-white shadow ${
+            className={`rounded-md px-4 py-2 text-sm text-white shadow cursor-pointer ${
               destructive
                 ? "bg-red-600 hover:bg-red-700 disabled:opacity-60"
                 : "bg-[#089bab] hover:bg-[#089bab]/80 disabled:opacity-60"
