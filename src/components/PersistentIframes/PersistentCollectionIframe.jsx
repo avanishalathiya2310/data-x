@@ -43,7 +43,7 @@ export default function PersistentCollectionsIframe() {
         title="Collections"
         src={`https://ssbi-dev.datax.nuvinno.no/superset/welcome?accessToken=${encodeURIComponent(
           currentToken
-        )}&userRole=${user.role}`}
+        )}&userRole=${user.role}&userId=${user.id}`}
         className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
         onLoad={() => setIsLoading(false)}
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups"

@@ -40,7 +40,7 @@ export default function PersistentIntegrationIframe() {
           currentToken
         )}&theme=${
           refreshNonce === "dark" ? "airbyteThemeDark" : "airbyteThemeLight"
-        }&userRole=${user.role}`}
+        }&userRole=${user.role}&userId=${user.id}`}
         className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
         onLoad={() => setIsLoading(false)}
       />
