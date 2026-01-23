@@ -7,7 +7,8 @@ export default function PersistentCollectionsIframe() {
   const { collectionsVisible, collectionsLoaded } = useSelector(
     (s) => s.iframe
   );
-  const { currentToken } = useSelector((s) => s.users);
+  const { currentToken, current: user } = useSelector((s) => s.users);
+
   const [refreshNonce, setRefreshNonce] = useState("light");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +23,7 @@ export default function PersistentCollectionsIframe() {
     return () => window.removeEventListener("theme-changed", handler);
   }, []);
 
-  if (!collectionsLoaded || !currentToken) return null;
+  if (!collectionsLoaded || !currentToken || !user) return null;
 
   return (
     <div
@@ -42,7 +43,7 @@ export default function PersistentCollectionsIframe() {
         title="Collections"
         src={`https://ssbi-dev.datax.nuvinno.no/superset/welcome?accessToken=${encodeURIComponent(
           currentToken
-        )}`}
+        )}&userRole=${user.role}`}
         className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
         onLoad={() => setIsLoading(false)}
         sandbox="allow-same-origin allow-scripts allow-forms allow-popups"

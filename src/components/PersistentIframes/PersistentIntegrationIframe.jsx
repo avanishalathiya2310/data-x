@@ -4,7 +4,7 @@ import Loader from "../layout/Loader";
 
 export default function PersistentIntegrationIframe() {
   const { ingestVisible, ingestLoaded } = useSelector((s) => s.iframe);
-  const { currentToken } = useSelector((s) => s.users);
+  const { currentToken, current: user } = useSelector((s) => s.users);
   const [refreshNonce, setRefreshNonce] = useState("light");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,7 +19,7 @@ export default function PersistentIntegrationIframe() {
     return () => window.removeEventListener("theme-changed", handler);
   }, []);
 
-  if (!ingestLoaded || !currentToken) return null;
+  if (!ingestLoaded || !currentToken || !user) return null;
 
   return (
     <div
@@ -40,7 +40,7 @@ export default function PersistentIntegrationIframe() {
           currentToken
         )}&theme=${
           refreshNonce === "dark" ? "airbyteThemeDark" : "airbyteThemeLight"
-        }`}
+        }&userRole=${user.role}`}
         className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
         onLoad={() => setIsLoading(false)}
       />

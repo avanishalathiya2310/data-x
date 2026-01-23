@@ -25,9 +25,7 @@ export default function PersistentCodepagesIframe() {
       )}
       <iframe
         title="Codepages"
-        src={`https://codepage-dev.datax.nuvinno.no/lab?accessToken=${encodeURIComponent(
-          currentToken
-        )}`}
+        src={`https://app-codepage-dev-fe-gsedcdb9brcte3bv.swedencentral-01.azurewebsites.net/lab`}
         className={`w-full h-full ${isLoading ? 'hidden' : 'block'}`}
         onLoad={() => setIsLoading(false)}
         allowFullScreen

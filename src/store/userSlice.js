@@ -90,7 +90,7 @@ export const updateUserPermissions = createAsyncThunk(
   async ({ userId, permissions }, { rejectWithValue }) => {
     try {
       await axiosApi.put(
-        "/api/v1/update-user-permission",
+        "/api/v1/user/update-user-permission",
         { id: userId, permissions },
         {
           headers: {
@@ -114,7 +114,7 @@ export const addUserThunk = createAsyncThunk(
   async ({ email, displayName, role_id }, { rejectWithValue }) => {
     try {
       const response = await axiosApi.post(
-        "/api/v1/add-user",
+        "/api/v1/user/add-user",
         { email, displayName, role_id },
         {
           headers: {

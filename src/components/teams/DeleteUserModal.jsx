@@ -57,13 +57,8 @@ const DeleteUserModal = ({ user, onClose, onConfirm }) => {
             ⚠️ Warning: This action cannot be undone
           </p>
           <p className="text-sm text-red-700 dark:text-red-300">
-            If you delete this user, all data related to this user will be
-            permanently deleted. This includes:
+            are you sure you want to delete this user?
           </p>
-          <ul className="mt-2 ml-4 text-sm text-red-700 dark:text-red-300 list-disc">
-            <li>User profile and settings</li>
-            <li>All related data and history</li>
-          </ul>
         </div>
 
         {/* User info */}
