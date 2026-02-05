@@ -138,7 +138,13 @@ const UsersList = () => {
           </div>
         )}
         {users.length > 0 &&
-          users.map((user) => {
+          [...users]
+            .sort((a, b) => {
+              const usernameA = (a.username || a.name || a.email || "").toLowerCase();
+              const usernameB = (b.username || b.name || b.email || "").toLowerCase();
+              return usernameA.localeCompare(usernameB);
+            })
+            .map((user) => {
             const isCurrentUser = currentUser?.id === user?.id;
             const userPermSet = new Set(
               Array.isArray(user.permissions)
