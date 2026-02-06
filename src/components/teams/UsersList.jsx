@@ -1,7 +1,7 @@
 // src/components/teams/UsersList.jsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchEntraUsers,
@@ -16,14 +16,30 @@ import AddUserModal from "./AddUser";
 import DeleteUserModal from "./DeleteUserModal";
 import { computeNextPermissionIds } from "@/app/(workspace)/admin/permissions/helpers";
 import { toast } from "react-toastify";
+import { fetchPermissions } from "@/store/permissionSlice";
 
 const UsersList = () => {
   const dispatch = useDispatch();
   const { items: users, loading, error } = useSelector((state) => state.users);
   const { items: roles } = useSelector((s) => s.roles);
-  const { current: currentUser } = useSelector((state) => state.users || {});
+  const { current: currentUser, currentToken } = useSelector(
+    (state) => state.users || {}
+  );
   const { entraUsers } = useSelector((state) => state.users);
   const permissions = useSelector((s) => s.permissions.items);
+
+  const load = useCallback(async () => {
+    await Promise.all([
+      users.length === 0 && dispatch(fetchUsers()),
+      dispatch(fetchPermissions()),
+    ]);
+  }, [dispatch, permissions.length, users.length]);
+
+  useEffect(() => {
+    if (currentUser && currentToken) {
+      load();
+    }
+  }, [currentUser, currentToken]);
 
   const handlePermissionToggle = async (user, permissionKey) => {
     if (user.id === currentUser?.id) return;
@@ -140,109 +156,119 @@ const UsersList = () => {
         {users.length > 0 &&
           [...users]
             .sort((a, b) => {
-              const usernameA = (a.username || a.name || a.email || "").toLowerCase();
-              const usernameB = (b.username || b.name || b.email || "").toLowerCase();
+              const usernameA = (
+                a.username ||
+                a.name ||
+                a.email ||
+                ""
+              ).toLowerCase();
+              const usernameB = (
+                b.username ||
+                b.name ||
+                b.email ||
+                ""
+              ).toLowerCase();
               return usernameA.localeCompare(usernameB);
             })
             .map((user) => {
-            const isCurrentUser = currentUser?.id === user?.id;
-            const userPermSet = new Set(
-              Array.isArray(user.permissions)
-                ? user.permissions.map((v) => toKey(v))
-                : []
-            );
-            return (
-              <li key={user.id} className="px-4 py-3 text-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="font-medium">{user.email}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {user.name || user.username || "No name provided"}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-8">
-                    {showPerms.length > 0 && (
-                      <div className="flex flex-wrap gap-3">
-                        {showPerms.map((p) => {
-                          const label = p.name.replace(/\b\w/g, (c) =>
-                            c.toUpperCase()
-                          );
-                          const checked = userPermSet.has(p.key);
-                          return (
-                            <label
-                              key={p.id}
-                              className={`inline-flex items-center gap-2 text-xs ${
-                                isCurrentUser ? "opacity-50" : ""
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                className="h-4 w-4 cursor-pointer"
-                                checked={!!checked}
-                                disabled={isCurrentUser}
-                                onChange={(e) =>
-                                  !isCurrentUser &&
-                                  handlePermissionToggle(user, p.key)
-                                }
-                              />
-                              <span>{label}</span>
-                            </label>
-                          );
-                        })}
+              const isCurrentUser = currentUser?.id === user?.id;
+              const userPermSet = new Set(
+                Array.isArray(user.permissions)
+                  ? user.permissions.map((v) => toKey(v))
+                  : []
+              );
+              return (
+                <li key={user.id} className="px-4 py-3 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="font-medium">{user.email}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.name || user.username || "No name provided"}
                       </div>
-                    )}
-                    <div className="mt-1">
-                      <select
-                        className={`text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary text-gray-900 dark:text-gray-100 px-2 py-1 ${
-                          isCurrentUser ? "opacity-50" : ""
-                        }`}
-                        value={user.role_id}
-                        disabled={isCurrentUser}
-                        onChange={(e) => {
-                          if (isCurrentUser) return;
-                          const newRoleId = parseInt(e.target.value);
-                          dispatch(
-                            updateUserRoleThunk({
-                              userId: user.id,
-                              roleId: newRoleId,
-                            })
-                          )
-                            .unwrap()
-                            .catch((error) => {
-                              // Revert the select value on error
-                              e.target.value = user.role_id;
-                              toast.error(
-                                error || "Failed to update user role"
-                              );
-                            });
-                        }}
-                      >
-                        {roles.map((role) => (
-                          <option key={role.id} value={role.id}>
-                            {role.role_name}
-                          </option>
-                        ))}
-                      </select>
                     </div>
 
-                    <button
-                      onClick={() => !isCurrentUser && setUserToDelete(user)}
-                      disabled={isCurrentUser}
-                      className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-                      title={
-                        isCurrentUser
-                          ? "You can't remove yourself"
-                          : "Remove member"
-                      }
-                    >
-                      <Trash size={14} />
-                    </button>
+                    <div className="flex items-center gap-8">
+                      {showPerms.length > 0 && (
+                        <div className="flex flex-wrap gap-3">
+                          {showPerms.map((p) => {
+                            const label = p.name.replace(/\b\w/g, (c) =>
+                              c.toUpperCase()
+                            );
+                            const checked = userPermSet.has(p.key);
+                            return (
+                              <label
+                                key={p.id}
+                                className={`inline-flex items-center gap-2 text-xs ${
+                                  isCurrentUser ? "opacity-50" : ""
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="h-4 w-4 cursor-pointer"
+                                  checked={!!checked}
+                                  disabled={isCurrentUser}
+                                  onChange={(e) =>
+                                    !isCurrentUser &&
+                                    handlePermissionToggle(user, p.key)
+                                  }
+                                />
+                                <span>{label}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <div className="mt-1">
+                        <select
+                          className={`text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-primary text-gray-900 dark:text-gray-100 px-2 py-1 ${
+                            isCurrentUser ? "opacity-50" : ""
+                          }`}
+                          value={user.role_id}
+                          disabled={isCurrentUser}
+                          onChange={(e) => {
+                            if (isCurrentUser) return;
+                            const newRoleId = parseInt(e.target.value);
+                            dispatch(
+                              updateUserRoleThunk({
+                                userId: user.id,
+                                roleId: newRoleId,
+                              })
+                            )
+                              .unwrap()
+                              .catch((error) => {
+                                // Revert the select value on error
+                                e.target.value = user.role_id;
+                                toast.error(
+                                  error || "Failed to update user role"
+                                );
+                              });
+                          }}
+                        >
+                          {roles.map((role) => (
+                            <option key={role.id} value={role.id}>
+                              {role.role_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <button
+                        onClick={() => !isCurrentUser && setUserToDelete(user)}
+                        disabled={isCurrentUser}
+                        className="inline-flex items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 text-xs disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                        title={
+                          isCurrentUser
+                            ? "You can't remove yourself"
+                            : "Remove member"
+                        }
+                      >
+                        <Trash size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </li>
-            );
-          })}
+                </li>
+              );
+            })}
       </ul>
       {isAddUserModalOpen && (
         <AddUserModal
