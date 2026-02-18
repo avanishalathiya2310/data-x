@@ -14,21 +14,25 @@ import {
   hideCollections,
   hideDatastore,
   hideIntegration,
+  hideETL,
   showCodepages,
   showCollections,
   showDatastore,
   showIntegration,
+  showETL,
 } from "@/store/iframeSlice";
 import PersistentIntegrationIframe from "@/components/PersistentIframes/PersistentIntegrationIframe";
 import PersistentDatastoreIframe from "@/components/PersistentIframes/PersistentDatastoreIframe";
 import PersistentCollectionIframe from "@/components/PersistentIframes/PersistentCollectionIframe";
 import PersistentCodepagesIframe from "@/components/PersistentIframes/PersistentCodepagesIframe";
+import PersistentETLIframe from "@/components/PersistentIframes/PersistentETLIframe";
 
 const routePermissions = [
   { base: "/integration", permission: "integration" },
   { base: "/datastore", permission: "datastore" },
   { base: "/collections", permission: "collections" },
   { base: "/codepages", permission: "codepages" },
+  { base: "/etl", permission: "etl" },
   { base: "/admin/permissions", permission: "permissions" },
   { base: "/admin/teams", permission: "teams" },
 ];
@@ -59,26 +63,37 @@ function LayoutInner({ children }) {
       dispatch(hideDatastore());
       dispatch(hideCollections());
       dispatch(hideCodepages());
+      dispatch(hideETL());
     } else if (pathname?.startsWith("/datastore")) {
       dispatch(showDatastore());
       dispatch(hideIntegration());
       dispatch(hideCollections());
       dispatch(hideCodepages());
+      dispatch(hideETL());
     } else if (pathname?.startsWith("/collections")) {
       dispatch(showCollections());
       dispatch(hideIntegration());
       dispatch(hideDatastore());
       dispatch(hideCodepages());
+      dispatch(hideETL());
     } else if (pathname?.startsWith("/codepages")) {
       dispatch(showCodepages());
       dispatch(hideIntegration());
       dispatch(hideDatastore());
       dispatch(hideCollections());
+      dispatch(hideETL());
+    } else if (pathname?.startsWith("/etl")) {
+      dispatch(showETL());
+      dispatch(hideIntegration());
+      dispatch(hideDatastore());
+      dispatch(hideCollections());
+      dispatch(hideCodepages());
     } else {
       dispatch(hideIntegration());
       dispatch(hideDatastore());
       dispatch(hideCollections());
       dispatch(hideCodepages());
+      dispatch(hideETL());
     }
   }, [pathname, dispatch]);
 
@@ -229,6 +244,7 @@ const layout = ({ children }) => {
         <PersistentDatastoreIframe />
         <PersistentCollectionIframe />
         <PersistentCodepagesIframe />
+        <PersistentETLIframe />
         {children}
       </LayoutInner>
     </StoreProvider>

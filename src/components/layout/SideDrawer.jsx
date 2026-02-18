@@ -16,6 +16,7 @@ import {
   UsersThree,
   TreeStructure,
   BookOpen,
+  CodeSimpleIcon,
 } from "@phosphor-icons/react";
 import { useSelector } from "react-redux";
 
@@ -50,6 +51,12 @@ const nav = [
         icon: BookOpen,
         permission: "codepages",
       },
+      {
+        label: "ETL",
+        href: "/etl",
+        icon: CodeSimpleIcon,
+        permission: "etl",
+      },
     ],
   },
   {
@@ -73,12 +80,17 @@ const SideDrawer = ({ expanded, onToggle }) => {
   const allowedNav = isSuperAdmin
     ? nav
     : isViewer
-    ? nav.filter((item) => item.permission === "collections" && permissions.includes("collections"))
+    ? nav.filter(
+        (item) =>
+          item.permission === "collections" &&
+          permissions.includes("collections")
+      )
     : nav.filter((item) => {
         // For accordion items, check if user has permission for any sub-item
         if (item.isAccordion && item.subItems) {
-          return item.subItems.some((subItem) =>
-            subItem.permission && permissions.includes(subItem.permission)
+          return item.subItems.some(
+            (subItem) =>
+              subItem.permission && permissions.includes(subItem.permission)
           );
         }
         // For regular items, check the item's permission
@@ -89,7 +101,7 @@ const SideDrawer = ({ expanded, onToggle }) => {
   // Auto-open accordion if current path matches any sub-item
   useEffect(() => {
     if (!expanded) return;
-    
+
     allowedNav.forEach((item) => {
       if (item.isAccordion && item.subItems) {
         const hasActiveSubItem = item.subItems.some(
@@ -130,7 +142,7 @@ const SideDrawer = ({ expanded, onToggle }) => {
           <div>
             {allowedNav.map((item) => {
               const IconCmp = item.icon;
-              
+
               // Handle accordion items
               if (item.isAccordion && item.subItems) {
                 const isAccordionOpen = openAccordion === item.label;

@@ -10,6 +10,8 @@ const initialState = {
   collectionsLoaded: false,
   codepagesVisible: false,
   codepagesLoaded: false,
+  etlVisible: false,
+  etlLoaded: false,
 };
 
 const iframeSlice = createSlice({
@@ -44,6 +46,13 @@ const iframeSlice = createSlice({
     hideCodepages(state) {
       state.codepagesVisible = false;
     },
+    showETL(state) {
+      state.etlVisible = true;
+      state.etlLoaded = true;
+    },
+    hideETL(state) {
+      state.etlVisible = false;
+    },
   },
 });
 
@@ -56,6 +65,8 @@ export const {
   hideCollections,
   showCodepages,
   hideCodepages,
+  showETL,
+  hideETL,
 } = iframeSlice.actions;
 
 export default iframeSlice.reducer;
