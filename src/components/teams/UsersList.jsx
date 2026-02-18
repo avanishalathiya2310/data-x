@@ -122,7 +122,7 @@ const UsersList = () => {
     "datastore",
     "collections",
     "codepages",
-    "etl"
+    "ETL"
   ];
   const showPerms = VISIBLE_PERM_KEYS.map((k) => ({ id: k, key: k, name: k }));
 
